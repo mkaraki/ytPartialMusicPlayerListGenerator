@@ -2,29 +2,43 @@ import yaml
 import os
 import json
 
-with open('items.yaml', 'r', encoding='utf-8') as iny:
-    yml = yaml.safe_load(iny)
 
-    allitems = []
+def readData(file, override=[]):
+    if ('import' in override):
+        override.pop('import')
 
-    for i, ov in enumerate(yml):
-        v = ov
-        if (i < len(yml) - 1):
-            v['next'] = yml[i + 1]['id']
-        else:
-            v['next'] = yml[0]['id']
+    with open(file, 'r', encoding='utf-8') as iny:
+        yml = yaml.safe_load(iny)
 
-        if (not 'platform' in v):
-            v['platform'] = 'yt'
+        allitems = []
 
-        if (not 'url' in v):
-            if (v['platform'] == 'yt'):
-                v['url'] = 'https://www.youtube.com/watch?v=' + v['video']
+        for i, ov in enumerate(yml):
+            v = dict(override, **ov)
 
-        allitems.append(v)
+            if ('import' in v):
+                allitems.extend(readData(v['import'], v))
+                continue
 
-        with open('out/' + v['id'] + '.json', 'w', encoding='utf-8') as ojs:
-            json.dump(v, ojs)
+            if (i < len(yml) - 1):
+                v['next'] = yml[i + 1]['id']
+            else:
+                v['next'] = yml[0]['id']
 
-    with open('out/data.json', 'w', encoding='utf-8') as aojs:
-        json.dump(allitems, aojs)
+            if (not 'platform' in v):
+                v['platform'] = 'yt'
+
+            if (not 'url' in v):
+                if (v['platform'] == 'yt'):
+                    v['url'] = 'https://www.youtube.com/watch?v=' + v['video']
+
+            allitems.append(v)
+
+            with open('out/' + v['id'] + '.json', 'w', encoding='utf-8') as ojs:
+                json.dump(v, ojs)
+
+        return allitems
+
+
+allitems = readData('items.yaml')
+with open('out/data.json', 'w', encoding='utf-8') as aojs:
+    json.dump(allitems, aojs)
