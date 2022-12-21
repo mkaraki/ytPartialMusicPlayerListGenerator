@@ -33,12 +33,23 @@ def readData(file, override=[]):
 
             allitems.append(v)
 
-            with open('out/' + v['id'] + '.json', 'w', encoding='utf-8') as ojs:
-                json.dump(v, ojs)
-
         return allitems
 
 
 allitems = readData('items.yaml')
+editedallitems = []
+
+for i, v in enumerate(allitems):
+    if (i < len(allitems) - 1):
+        v['next'] = allitems[i + 1]['id']
+    else:
+        v['next'] = allitems[0]['id']
+
+    editedallitems.append(v)
+
+    with open('out/' + v['id'] + '.json', 'w', encoding='utf-8') as ojs:
+        json.dump(v, ojs)
+
+
 with open('out/data.json', 'w', encoding='utf-8') as aojs:
-    json.dump(allitems, aojs)
+    json.dump(editedallitems, aojs)
