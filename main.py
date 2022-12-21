@@ -9,8 +9,10 @@ with open('items.yaml', 'r', encoding='utf-8') as iny:
 
     for i, ov in enumerate(yml):
         v = ov
-        if (i > 0):
-            v['next'] = yml[i - 1]['id']
+        if (i < len(yml) - 1):
+            v['next'] = yml[i + 1]['id']
+        else:
+            v['next'] = yml[0]['id']
 
         if (not 'platform' in v):
             v['platform'] = 'yt'
