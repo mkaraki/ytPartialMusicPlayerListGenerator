@@ -4,6 +4,9 @@ import json
 
 
 def readData(file, override=[]):
+    abspath = os.path.abspath(file)
+    parentdir = os.path.dirname(abspath)
+
     if ('import' in override):
         override.pop('import')
 
@@ -16,7 +19,9 @@ def readData(file, override=[]):
             v = dict(override, **ov)
 
             if ('import' in v):
-                allitems.extend(readData(v['import'], v))
+                allitems.extend(
+                    readData(os.path.join(parentdir, v['import']), v)
+                )
                 continue
 
             if (i < len(yml) - 1):
